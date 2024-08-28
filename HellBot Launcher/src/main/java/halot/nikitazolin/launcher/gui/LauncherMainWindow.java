@@ -32,8 +32,8 @@ public class LauncherMainWindow {
 
   private String appName = "HellBot Launcher";
   private String icoPath = "src/main/resources/image/hellbot_1024x1024.png";
-  private short width = 1000;
-  private short height = 600;
+  private short width = 700;
+  private short height = 500;
 
   public void showLauncherWindow() {
     checkHeadless();
@@ -53,12 +53,12 @@ public class LauncherMainWindow {
     JPanel configDiscordPanel = configurationDiscordTab.makeTab();
     JPanel configYoutubePanel = configurationYoutubeTab.makeTab();
     JPanel configDbPanel = configurationDbTab.makeTab();
-    tabbedPane.addTab("Статус", statusPanel);
-    tabbedPane.addTab("Приложение", appPanel);
-    tabbedPane.addTab("Настройки конфигурации", configPanel);
-    tabbedPane.addTab("Настройки Discord API", configDiscordPanel);
-    tabbedPane.addTab("Настройки YouTube", configYoutubePanel);
-    tabbedPane.addTab("Настройки БД", configDbPanel);
+    tabbedPane.addTab(statusPanel.getName(), statusPanel);
+    tabbedPane.addTab(appPanel.getName(), appPanel);
+    tabbedPane.addTab(configPanel.getName(), configPanel);
+    tabbedPane.addTab(configDiscordPanel.getName(), configDiscordPanel);
+    tabbedPane.addTab(configYoutubePanel.getName(), configYoutubePanel);
+    tabbedPane.addTab(configDbPanel.getName(), configDbPanel);
     frame.add(tabbedPane);
 
     frame.setVisible(true);

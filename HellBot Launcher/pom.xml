@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.halot.nikitazolin</groupId>
   <artifactId>hell-bot-launcher</artifactId>
-  <version>0.0.4</version>
+  <version>0.0.5</version>
   <name>HellBot Launcher</name>
   <description>Easy managing HellBot application</description>
 

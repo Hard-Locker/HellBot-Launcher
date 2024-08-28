@@ -10,6 +10,7 @@ import javax.swing.JTextArea;
 
 import org.springframework.stereotype.Component;
 
+import halot.nikitazolin.launcher.localization.gui.tab.TabProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,6 +18,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 public class ConfigurationDbTab {
+
+  private final TabProvider tabProvider;
 
   public JPanel makeTab() {
     JPanel configPanel = new JPanel();
