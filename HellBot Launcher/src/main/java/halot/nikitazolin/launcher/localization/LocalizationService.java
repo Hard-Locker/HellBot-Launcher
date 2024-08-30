@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import halot.nikitazolin.launcher.localization.app.manager.ManagerProvider;
 import halot.nikitazolin.launcher.localization.gui.tab.TabProvider;
+import halot.nikitazolin.launcher.localization.gui.tray.TrayProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,6 +21,7 @@ public class LocalizationService {
 
   private final TabProvider tabProvider;
   private final ManagerProvider managerProvider;
+  private final TrayProvider trayProvider;
 
   private static final String LANGUAGE_FILE_PATH = "language";
 
@@ -45,6 +47,7 @@ public class LocalizationService {
   private void setLanguage(String language) {
     tabProvider.initializeLanguage(language);
     managerProvider.initializeLanguage(language);
+    trayProvider.initializeLanguage(language);
   }
 
   private String readLanguageFromFile() {
