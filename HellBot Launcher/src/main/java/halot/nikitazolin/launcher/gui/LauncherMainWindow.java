@@ -67,7 +67,7 @@ public class LauncherMainWindow {
     tabbedPane.addTab(settingPanel.getName(), settingPanel);
     frame.add(tabbedPane);
     
-    systemTrayManager.hideToTray(frame);
+    systemTrayManager.makeTray(frame);
 
     frame.setVisible(visible);
   }

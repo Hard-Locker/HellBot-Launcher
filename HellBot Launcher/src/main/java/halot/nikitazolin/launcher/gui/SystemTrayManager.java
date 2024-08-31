@@ -30,11 +30,8 @@ public class SystemTrayManager {
   private final String appName = ApplicationRunnerImpl.APP_NAME;
   private final String icoPath = ApplicationRunnerImpl.APP_ICON_PATH;
 
-  public void hideToTray(JFrame frame) {
-    if (!SystemTray.isSupported()) {
-      log.error("SystemTray not supported on this platform");
-      return;
-    }
+  public void makeTray(JFrame frame) {
+    checkSupported();
 
     PopupMenu popupMenu = new PopupMenu();
 
@@ -102,6 +99,11 @@ public class SystemTrayManager {
     });
   }
 
+  public void hideWindow(JFrame frame) {
+    frame.setVisible(false);
+    log.debug("Window {} hide to tray", appName);
+  }
+
   private void updateStatusItem(MenuItem statusItem) {
     String statusText = trayProvider.getText("tray.status");
     String runningText = trayProvider.getText("tray.status_on");
@@ -114,8 +116,10 @@ public class SystemTrayManager {
     }
   }
 
-  public void hideWindow(JFrame frame) {
-    frame.setVisible(false);
-    log.debug("Window {} hide to tray", appName);
+  private void checkSupported() {
+    if (!SystemTray.isSupported()) {
+      log.error("SystemTray not supported on this platform");
+      return;
+    }
   }
 }
