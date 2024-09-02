@@ -17,6 +17,7 @@ import halot.nikitazolin.launcher.gui.tab.ConfigurationTab;
 import halot.nikitazolin.launcher.gui.tab.ConfigurationYoutubeTab;
 import halot.nikitazolin.launcher.gui.tab.SettingTab;
 import halot.nikitazolin.launcher.gui.tab.StatusTab;
+import halot.nikitazolin.launcher.init.settings.model.Settings;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,19 +34,35 @@ public class LauncherMainWindow {
   private final ConfigurationDbTab configurationDbTab;
   private final SettingTab settingTab;
   private final SystemTrayManager systemTrayManager;
+  private final Settings settings;
 
   private String appName = ApplicationRunnerImpl.APP_NAME;
   private String icoPath = ApplicationRunnerImpl.APP_ICON_PATH;
   private short width = 700;
   private short height = 500;
 
-  public void showLauncherWindow(boolean visible) {
+  public void makeLauncherWindow(boolean windowVisible) {
     checkHeadless();
 
+    JFrame frame = makeWindow();
+    
+    if (settings.isShowInTray()) {
+      systemTrayManager.makeTray(frame);
+    }
+
+    frame.setVisible(windowVisible);
+  }
+  
+  private JFrame makeWindow() {
     JFrame frame = new JFrame(appName);
-    frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
     frame.setSize(width, height);
     frame.setLocationRelativeTo(null);
+    
+    if (settings.isShowInTray() && settings.isHideToTrayOnClose()) {
+      frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+    } else {
+      frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    }
 
     ImageIcon ico = new ImageIcon(icoPath);
     frame.setIconImage(ico.getImage());
@@ -67,9 +84,7 @@ public class LauncherMainWindow {
     tabbedPane.addTab(settingPanel.getName(), settingPanel);
     frame.add(tabbedPane);
     
-    systemTrayManager.makeTray(frame);
-
-    frame.setVisible(visible);
+    return frame;
   }
 
   private void checkHeadless() {

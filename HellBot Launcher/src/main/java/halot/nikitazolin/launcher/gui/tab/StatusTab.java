@@ -8,7 +8,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
@@ -16,38 +15,72 @@ import javax.swing.SwingConstants;
 import org.springframework.stereotype.Component;
 
 import halot.nikitazolin.launcher.app.AppService;
+import halot.nikitazolin.launcher.app.manager.AppStatusObserver;
 import halot.nikitazolin.launcher.localization.gui.tab.TabProvider;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class StatusTab {
+public class StatusTab implements AppStatusObserver {
 
   private final AppService appService;
   private final TabProvider tabProvider;
 
+  JLabel statusLabel = new JLabel();
+
+  @PostConstruct
+  public void init() {
+    appService.addObserver(this);
+  }
+
+  @PreDestroy
+  public void destroy() {
+    appService.removeObserver(this);
+  }
+
+  @Override
+  public void onAppStatusChanged() {
+    updateStatusBar();
+  }
+
   public JPanel makeTab() {
     log.debug("Start making tab, {}", this);
 
-    String tabNameText = tabProvider.getText("status_tab.tab_name");
-    String startText = tabProvider.getText("status_tab.start");
-    String stopText = tabProvider.getText("status_tab.stop");
-    String startupText = tabProvider.getText("status_tab.startup");
+    JPanel statusPanel = createStatusPanel();
+    JLabel statusLabel = createStatusLabel();
+    JPanel controlsPanel = createControlsPanel();
 
+    statusPanel.add(statusLabel, BorderLayout.NORTH);
+    statusPanel.add(controlsPanel, BorderLayout.CENTER);
+
+    return statusPanel;
+  }
+
+  private JPanel createStatusPanel() {
+    String tabNameText = tabProvider.getText("status_tab.tab_name");
     JPanel statusPanel = new JPanel(new BorderLayout());
     statusPanel.setName(tabNameText);
+    return statusPanel;
+  }
 
-    JLabel statusLabel = new JLabel();
+  private JLabel createStatusLabel() {
     statusLabel.setOpaque(true);
     statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
-    updateStatusBar(statusLabel);
+    updateStatusBar();
+    return statusLabel;
+  }
+
+  private JPanel createControlsPanel() {
+    String startText = tabProvider.getText("status_tab.start");
+    String stopText = tabProvider.getText("status_tab.stop");
 
     JPanel controlsPanel = new JPanel(new GridBagLayout());
     JButton startButton = new JButton(startText);
     JButton stopButton = new JButton(stopText);
-    JCheckBox startupCheckBox = new JCheckBox(startupText);
 
     Dimension buttonSize = new Dimension(100, 30);
     startButton.setPreferredSize(buttonSize);
@@ -66,33 +99,20 @@ public class StatusTab {
     gbc.gridy = 0;
     controlsPanel.add(stopButton, gbc);
 
-    gbc.gridx = 0;
-    gbc.gridy = 1;
-    gbc.gridwidth = 2;
-    gbc.anchor = GridBagConstraints.WEST;
-    controlsPanel.add(startupCheckBox, gbc);
-
-    statusPanel.add(statusLabel, BorderLayout.NORTH);
-    statusPanel.add(controlsPanel, BorderLayout.CENTER);
-
     startButton.addActionListener(e -> {
       appService.start();
-      updateStatusBar(statusLabel);
+      updateStatusBar();
     });
 
     stopButton.addActionListener(e -> {
       appService.stop();
-      updateStatusBar(statusLabel);
-    });
-    
-    startupCheckBox.addActionListener(e -> {
-      appService.changeStartup();
+      updateStatusBar();
     });
 
-    return statusPanel;
+    return controlsPanel;
   }
 
-  private void updateStatusBar(JLabel statusLabel) {
+  private void updateStatusBar() {
     if (appService.isRunning()) {
       String statusOnText = tabProvider.getText("status_tab.status_on");
       statusLabel.setText(statusOnText);
