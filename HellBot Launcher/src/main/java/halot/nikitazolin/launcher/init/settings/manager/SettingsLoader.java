@@ -38,7 +38,7 @@ public class SettingsLoader {
     try {
       settings.setShowInTray(defaultIfNull(loadedConfig.isShowInTray(), true));
       settings.setHideToTrayOnClose(defaultIfNull(loadedConfig.isHideToTrayOnClose(), true));
-      settings.setStartupLauncher(defaultIfNull(loadedConfig.isStartupLauncher(), true));
+      settings.setAutostartLauncher(defaultIfNull(loadedConfig.isAutostartLauncher(), true));
       settings.setAutostartApp(defaultIfNull(loadedConfig.isAutostartApp(), true));
       log.debug("Successfully applied settings");
     } catch (Exception e) {

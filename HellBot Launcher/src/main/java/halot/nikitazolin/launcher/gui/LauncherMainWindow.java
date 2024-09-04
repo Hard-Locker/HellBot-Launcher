@@ -1,6 +1,7 @@
 package halot.nikitazolin.launcher.gui;
 
 import java.awt.GraphicsEnvironment;
+import java.net.URL;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -26,6 +27,9 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class LauncherMainWindow {
 
+  private static final String appName = ApplicationRunnerImpl.APP_NAME;
+  private static final String icoPath = ApplicationRunnerImpl.APP_ICON_PATH;
+
   private final StatusTab statusTab;
   private final ApplicationTab applicationTab;
   private final ConfigurationTab configurationTab;
@@ -36,8 +40,6 @@ public class LauncherMainWindow {
   private final SystemTrayManager systemTrayManager;
   private final Settings settings;
 
-  private String appName = ApplicationRunnerImpl.APP_NAME;
-  private String icoPath = ApplicationRunnerImpl.APP_ICON_PATH;
   private short width = 700;
   private short height = 500;
 
@@ -45,27 +47,32 @@ public class LauncherMainWindow {
     checkHeadless();
 
     JFrame frame = makeWindow();
-    
+
     if (settings.isShowInTray()) {
       systemTrayManager.makeTray(frame);
     }
 
     frame.setVisible(windowVisible);
   }
-  
+
   private JFrame makeWindow() {
     JFrame frame = new JFrame(appName);
     frame.setSize(width, height);
     frame.setLocationRelativeTo(null);
-    
+
     if (settings.isShowInTray() && settings.isHideToTrayOnClose()) {
       frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
     } else {
       frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
-    ImageIcon ico = new ImageIcon(icoPath);
-    frame.setIconImage(ico.getImage());
+    URL iconUrl = getClass().getResource(icoPath);
+    if (iconUrl != null) {
+      ImageIcon ico = new ImageIcon(iconUrl);
+      frame.setIconImage(ico.getImage());
+    } else {
+      log.error("Icon not found");
+    }
 
     JTabbedPane tabbedPane = new JTabbedPane();
     JPanel statusPanel = statusTab.makeTab();
@@ -83,7 +90,7 @@ public class LauncherMainWindow {
     tabbedPane.addTab(configDbPanel.getName(), configDbPanel);
     tabbedPane.addTab(settingPanel.getName(), settingPanel);
     frame.add(tabbedPane);
-    
+
     return frame;
   }
 

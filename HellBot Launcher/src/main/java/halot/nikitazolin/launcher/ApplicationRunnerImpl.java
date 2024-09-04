@@ -20,9 +20,9 @@ import lombok.extern.slf4j.Slf4j;
 public class ApplicationRunnerImpl implements ApplicationRunner {
 
   public static final String APP_NAME = "HellBot Launcher";
-  public static final String APP_ICON_PATH = "src/main/resources/image/hellbot_256x256.png";
-  public static final String TRAY_ON_ICON_PATH = "src/main/resources/image/ico/tray/tray_on_256x256.png";
-  public static final String TRAY_OFF_ICON_PATH = "src/main/resources/image/ico/tray/tray_off_256x256.png";
+  public static final String APP_ICON_PATH = "/image/hellbot_256x256.png";
+  public static final String TRAY_ON_ICON_PATH = "/image/ico/tray/tray_on_256x256.png";
+  public static final String TRAY_OFF_ICON_PATH = "/image/ico/tray/tray_off_256x256.png";
   public static final String APP_DIRECTORY_PATH = "apps";
   public static final String SETTINGS_FILE_PATH = "settings.yml";
   public static final String LANGUAGE_FILE_PATH = "language";
@@ -38,8 +38,9 @@ public class ApplicationRunnerImpl implements ApplicationRunner {
   public void run(ApplicationArguments args) throws Exception {
     settingsService.validateSettings();
     localizationService.initializeLocale();
+
     launcherMainWindow.makeLauncherWindow(true);
-    
+
     if (settings.isAutostartApp()) {
       appService.start();
     }

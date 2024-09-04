@@ -7,6 +7,8 @@ import java.awt.PopupMenu;
 import java.awt.SystemTray;
 import java.awt.Toolkit;
 import java.awt.TrayIcon;
+import java.awt.image.BufferedImage;
+import java.net.URL;
 
 import javax.swing.JFrame;
 
@@ -34,7 +36,7 @@ public class SystemTrayManager implements AppStatusObserver {
   private final AppService appService;
   private final TrayProvider trayProvider;
 
-  private TrayIcon trayIcon = new TrayIcon(Toolkit.getDefaultToolkit().getImage(iconPath), appName);
+  private TrayIcon trayIcon;
   private MenuItem statusItem;
 
   @PostConstruct
@@ -55,6 +57,37 @@ public class SystemTrayManager implements AppStatusObserver {
   public void makeTray(JFrame frame) {
     checkSupported();
 
+    PopupMenu popupMenu = createPopupMenu(frame);
+
+    trayIcon = initializeTrayImage();
+    trayIcon.setPopupMenu(popupMenu);
+    trayIcon.setImageAutoSize(true);
+
+    try {
+      SystemTray.getSystemTray().add(trayIcon);
+      log.debug("Application icon {} added to system tray", appName);
+    } catch (AWTException e) {
+      log.error("Failed to add icon to system tray", e);
+    }
+
+    trayIcon.addActionListener(e -> openMainWindow(frame));
+
+    updateStatus();
+  }
+
+  private TrayIcon initializeTrayImage() {
+    URL iconUrl = getClass().getResource(iconPath);
+
+    if (iconUrl != null) {
+      log.error("Set base tray icon");
+      return new TrayIcon(Toolkit.getDefaultToolkit().getImage(iconUrl), appName);
+    } else {
+      log.error("Tray icon not found");
+      return new TrayIcon(new BufferedImage(64, 64, BufferedImage.TYPE_INT_ARGB), appName);
+    }
+  }
+
+  private PopupMenu createPopupMenu(JFrame frame) {
     PopupMenu popupMenu = new PopupMenu();
 
     String openText = trayProvider.getText("tray.open");
@@ -69,7 +102,11 @@ public class SystemTrayManager implements AppStatusObserver {
     MenuItem shutdownItem = new MenuItem(shutdownText);
 
     statusItem.setEnabled(false);
-    updateStatus();
+
+    openItem.addActionListener(e -> openMainWindow(frame));
+    startItem.addActionListener(e -> startApp());
+    stopItem.addActionListener(e -> stopApp());
+    shutdownItem.addActionListener(e -> shutdownApp());
 
     popupMenu.add(openItem);
     popupMenu.addSeparator();
@@ -79,45 +116,31 @@ public class SystemTrayManager implements AppStatusObserver {
     popupMenu.addSeparator();
     popupMenu.add(shutdownItem);
 
-    openItem.addActionListener(e -> {
-      frame.setVisible(true);
-      frame.setState(Frame.NORMAL);
-      log.debug("Window {} opened from tray", appName);
-    });
+    return popupMenu;
+  }
 
-    startItem.addActionListener(e -> {
-      appService.start();
-      log.debug("Application started from tray");
-      updateStatus();
-    });
+  private void openMainWindow(JFrame frame) {
+    frame.setVisible(true);
+    frame.setState(Frame.NORMAL);
+    log.debug("Window {} opened from tray", appName);
+  }
 
-    stopItem.addActionListener(e -> {
-      appService.stop();
-      log.debug("Application stopped from tray");
-      updateStatus();
-    });
+  private void startApp() {
+    appService.start();
+    log.debug("Application started from tray");
+    updateStatus();
+  }
 
-    shutdownItem.addActionListener(e -> {
-      log.info("Shutting down the application {}", appName);
-      System.exit(0);
-    });
+  private void stopApp() {
+    appService.stop();
+    log.debug("Application stopped from tray");
+    updateStatus();
+  }
 
-    trayIcon.setImage(Toolkit.getDefaultToolkit().getImage(iconPath));
-    trayIcon.setImageAutoSize(true);
-    trayIcon.setPopupMenu(popupMenu);
-
-    try {
-      SystemTray.getSystemTray().add(trayIcon);
-      log.debug("Application icon {} added to system tray", appName);
-    } catch (AWTException e) {
-      log.error("Failed to add icon to system tray", e);
-    }
-
-    trayIcon.addActionListener(e -> {
-      frame.setVisible(true);
-      frame.setState(Frame.NORMAL);
-      log.debug("Window {} opened from tray", appName);
-    });
+  private void shutdownApp() {
+    stopApp();
+    log.info("Shutting down the application {}", appName);
+    System.exit(0);
   }
 
   private void updateStatus() {
@@ -138,10 +161,21 @@ public class SystemTrayManager implements AppStatusObserver {
   }
 
   private void updateStatusIcon() {
+    URL iconOnUrl = getClass().getResource(iconTrayOnPath);
+    URL iconOffUrl = getClass().getResource(iconTrayOffPath);
+
     if (appService.isRunning()) {
-      trayIcon.setImage(Toolkit.getDefaultToolkit().getImage(iconTrayOnPath));
+      updateIcon(iconOnUrl, "ON");
     } else {
-      trayIcon.setImage(Toolkit.getDefaultToolkit().getImage(iconTrayOffPath));
+      updateIcon(iconOffUrl, "OFF");
+    }
+  }
+
+  private void updateIcon(URL iconUrl, String status) {
+    if (iconUrl != null) {
+      trayIcon.setImage(Toolkit.getDefaultToolkit().getImage(iconUrl));
+    } else {
+      log.error("Tray icon {} not found", status);
     }
   }
 

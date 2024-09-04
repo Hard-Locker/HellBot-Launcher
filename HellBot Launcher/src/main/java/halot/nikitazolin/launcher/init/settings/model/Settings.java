@@ -12,6 +12,6 @@ public class Settings {
 
   private boolean showInTray = true;
   private boolean hideToTrayOnClose = true;
-  private boolean startupLauncher = true;
+  private boolean autostartLauncher = true;
   private boolean autostartApp = true;
 }

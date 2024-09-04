@@ -69,14 +69,14 @@ public class SettingTab {
 
     JCheckBox showInTrayCheckBox = createShowInTrayCheckBox();
     JCheckBox hideOnCloseCheckBox = createHideOnCloseCheckBox(showInTrayCheckBox);
-    JCheckBox startupLauncherCheckBox = createStartupLauncherCheckBox();
+    JCheckBox autostartLauncherCheckBox = createAutostartLauncherCheckBox();
     JCheckBox autostartAppCheckBox = createAutostartAppCheckBox();
     JComboBox<String> languageComboBox = createLanguageComboBox();
     JLabel restartHintLabel = createRestartHintLabel();
 
     panel.add(showInTrayCheckBox, positionComponent(gbc, 0, 0, 2));
     panel.add(hideOnCloseCheckBox, positionComponent(gbc, 0, 1, 2));
-    panel.add(startupLauncherCheckBox, positionComponent(gbc, 0, 2, 2));
+    panel.add(autostartLauncherCheckBox, positionComponent(gbc, 0, 2, 2));
     panel.add(autostartAppCheckBox, positionComponent(gbc, 0, 3, 2));
     panel.add(new JLabel(tabProvider.getText("setting_tab.language")), positionComponent(gbc, 0, 4, 1));
     panel.add(languageComboBox, positionComponent(gbc, 1, 4, 1));
@@ -118,14 +118,14 @@ public class SettingTab {
     return checkBox;
   }
 
-  private JCheckBox createStartupLauncherCheckBox() {
-    String startupLauncherText = tabProvider.getText("setting_tab.startup_launcher");
-    JCheckBox checkBox = new JCheckBox(startupLauncherText, settings.isStartupLauncher());
+  private JCheckBox createAutostartLauncherCheckBox() {
+    String aotustartLauncherText = tabProvider.getText("setting_tab.autostart_launcher");
+    JCheckBox checkBox = new JCheckBox(aotustartLauncherText, settings.isAutostartLauncher());
 
     checkBox.addActionListener(e -> {
       boolean selected = checkBox.isSelected();
       log.debug("Clicked checkbox: {}", checkBox.getName());
-      appService.changeStartupLauncher(selected);
+      appService.changeAutostartLauncher(selected);
     });
 
     return checkBox;
