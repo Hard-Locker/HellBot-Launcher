@@ -12,6 +12,7 @@ import halot.nikitazolin.launcher.ApplicationRunnerImpl;
 import halot.nikitazolin.launcher.app.manager.AppFileManager;
 import halot.nikitazolin.launcher.app.manager.AppProcessManager;
 import halot.nikitazolin.launcher.app.manager.AppStatusObserver;
+import halot.nikitazolin.launcher.app.manager.AutoStartupManager;
 import halot.nikitazolin.launcher.init.settings.SettingsService;
 import halot.nikitazolin.launcher.init.settings.model.Settings;
 import halot.nikitazolin.launcher.localization.LocalizationService;
@@ -28,6 +29,7 @@ public class AppService {
   private final Settings settings;
   private final SettingsService settingsService;
   private final LocalizationService localizationService;
+  private final AutoStartupManager autoStartupManager;
 
   private final String jarAppName = "hell-bot";
   private final String directoryPath = ApplicationRunnerImpl.APP_DIRECTORY_PATH;
@@ -80,6 +82,7 @@ public class AppService {
 
     Path appDirectoryPath = Paths.get(directoryPath);
     Optional<String> appPathOptional = appFileManager.findJarFileAbsolutePath(jarAppName, appDirectoryPath);
+
     if (appPathOptional.isPresent()) {
       String appPath = appPathOptional.get();
       log.info("Deleting old application jar file: {}", appPath);
@@ -132,12 +135,30 @@ public class AppService {
     log.debug("'Hide On Close' setting updated");
   }
 
-  // TODO Need to implement use this settings
-  public void changeStartupLauncher(boolean startupLauncher) {
-    log.info("Changing setting 'Startup Launcher' to {}", startupLauncher);
-    settings.setStartupLauncher(startupLauncher);
+  public void changeAutostartLauncher(boolean autostartLauncher) {
+    log.info("Changing setting 'Autostart Launcher' to {}", autostartLauncher);
+
+    boolean operationSuccessful = false;
+
+    if (autostartLauncher) {
+      operationSuccessful = autoStartupManager.addLauncherToStartup();
+
+      if (!operationSuccessful) {
+        log.error("Failed to add launcher to startup.");
+        return;
+      }
+    } else {
+      operationSuccessful = autoStartupManager.removeLauncherFromStartup();
+
+      if (!operationSuccessful) {
+        log.error("Failed to remove launcher from startup.");
+        return;
+      }
+    }
+
+    settings.setAutostartLauncher(autostartLauncher);
     settingsService.saveSettings();
-    log.debug("'Startup Launcher' setting updated");
+    log.debug("'Autostart Launcher' setting updated successfully.");
   }
 
   public void changeAutostartApp(boolean autostartApp) {

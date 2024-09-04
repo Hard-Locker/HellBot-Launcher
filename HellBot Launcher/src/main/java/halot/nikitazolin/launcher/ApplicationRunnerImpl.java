@@ -39,7 +39,8 @@ public class ApplicationRunnerImpl implements ApplicationRunner {
     settingsService.validateSettings();
     localizationService.initializeLocale();
 
-    launcherMainWindow.makeLauncherWindow(true);
+    boolean showWindow = !args.containsOption("hidden");
+    launcherMainWindow.makeLauncherWindow(showWindow);
 
     if (settings.isAutostartApp()) {
       appService.start();
