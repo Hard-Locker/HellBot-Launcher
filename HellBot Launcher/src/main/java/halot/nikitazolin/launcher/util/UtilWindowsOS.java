@@ -110,6 +110,39 @@ public class UtilWindowsOS {
   }
 
   /**
+   * Checks if a shortcut exists in a specified folder.
+   *
+   * @param folderPath   the path to the folder
+   * @param shortcutName the name of the shortcut (without .lnk extension)
+   * @return true if the shortcut exists, false otherwise
+   */
+  public boolean shortcutExists(String folderPath, String shortcutName) {
+    if (folderPath == null || folderPath.isEmpty()) {
+      log.error("Folder path is invalid (null or empty)");
+      return false;
+    }
+
+    File folder = new File(folderPath);
+
+    if (!folder.isDirectory()) {
+      log.error("'{}' is not a valid directory", folderPath);
+      return false;
+    }
+
+    String shortcutFileName = shortcutName.endsWith(".lnk") ? shortcutName : shortcutName + ".lnk";
+    File shortcutFile = new File(folder, shortcutFileName);
+    log.debug("Checking if shortcut '{}' exists in folder '{}'", shortcutFileName, folderPath);
+
+    if (shortcutFile.exists() && shortcutFile.isFile()) {
+      log.debug("Shortcut '{}' exists in folder '{}'", shortcutFileName, folderPath);
+      return true;
+    } else {
+      log.debug("Shortcut '{}' does not exist in folder '{}'", shortcutFileName, folderPath);
+      return false;
+    }
+  }
+
+  /**
    * Deletes the shortcut file.
    *
    * @param shortcutFilePath the path to the shortcut file (e.g., .lnk)
@@ -171,6 +204,28 @@ public class UtilWindowsOS {
     String command = "Remove-ItemProperty -Path '" + registryKey + "' -Name '" + name + "'";
     log.debug("Building command to remove from registry: '{}'", command);
     return command;
+  }
+
+  /**
+   * Checks if a registry entry exists.
+   *
+   * @param registryKey the registry key path (e.g.,
+   *                    "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run")
+   * @param name        the name of the registry entry
+   * @return true if the registry entry exists, false otherwise
+   */
+  public boolean registryEntryExists(String registryKey, String name) {
+    String command = "Get-ItemProperty -Path '" + registryKey + "' -Name '" + name + "'";
+    log.debug("Checking if registry entry exists: '{}, {}'", registryKey, name);
+    boolean commandSuccess = executePowerShellCommand(command);
+
+    if (commandSuccess) {
+      log.debug("Registry entry '{}' in '{}' exists", name, registryKey);
+      return true;
+    } else {
+      log.debug("Registry entry '{}' in '{}' does not exist", name, registryKey);
+      return false;
+    }
   }
 
   /**

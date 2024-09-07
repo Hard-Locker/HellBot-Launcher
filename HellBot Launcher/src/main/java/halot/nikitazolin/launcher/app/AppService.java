@@ -139,32 +139,13 @@ public class AppService {
     log.info("Changing setting 'Autostart Launcher' to {}", autostartLauncher);
     boolean operationSuccessful = false;
 
-    if (autostartLauncher == true) {
-      operationSuccessful = startupManager.addLauncherToStartup();
+    operationSuccessful = startupManager.autoFixStartup(autostartLauncher);
 
-      if (operationSuccessful) {
-        settings.setAutostartLauncher(true);
-      } else {
-        log.error("Failed to add launcher to startup.");
-        settings.setAutostartLauncher(false);
-        return;
-      }
+    if (operationSuccessful) {
+      settings.setAutostartLauncher(autostartLauncher);
+      settingsService.saveSettings();
+      log.debug("'Autostart Launcher' setting updated successfully.");
     }
-
-    if (autostartLauncher == false) {
-      operationSuccessful = startupManager.removeLauncherFromStartup();
-
-      if (operationSuccessful) {
-        log.error("Failed to remove launcher from startup.");
-        settings.setAutostartLauncher(true);
-        return;
-      } else {
-        settings.setAutostartLauncher(false);
-      }
-    }
-
-    settingsService.saveSettings();
-    log.debug("'Autostart Launcher' setting updated successfully.");
   }
 
   public void changeAutostartApp(boolean autostartApp) {

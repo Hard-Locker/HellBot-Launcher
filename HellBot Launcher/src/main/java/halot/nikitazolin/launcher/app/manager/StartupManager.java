@@ -22,7 +22,38 @@ public class StartupManager {
 
   private final UtilWindowsOS utilWindowsOS;
 
-  public boolean addLauncherToStartup() {
+  /**
+   * This method is designed to automatically set or fix startup. This logic is
+   * needed to prevent double startup when loading the system. That is, so that
+   * the user does not add JAR and EXE to startup at the same time.
+   * 
+   * @param startup means true to enable startup or false to disable startup
+   * @return true if operation success, false otherwise
+   */
+  public boolean autoFixStartup(boolean startup) {
+    if (startup == true) {
+      boolean shortcutExists = utilWindowsOS.shortcutExists(STARTUP_FOLDER_PATH, LAUNCHER_NAME);
+      boolean registryEntryExists = utilWindowsOS.registryEntryExists(UtilWindowsOS.USER_STARTUP_REGISTRY_KEY,
+          LAUNCHER_NAME);
+
+      if (shortcutExists || registryEntryExists) {
+        log.debug("Found entry in startup. Trying to remove and add launcher to startup.");
+        return removeLauncherFromStartup() && addLauncherToStartup();
+      } else {
+        log.debug("Trying to add launcher to startup.");
+        return addLauncherToStartup();
+      }
+    }
+
+    if (startup == false) {
+      log.debug("Trying to remove launcher from startup.");
+      return removeLauncherFromStartup();
+    }
+
+    return false;
+  }
+
+  private boolean addLauncherToStartup() {
     try {
       String launcherPath = getLauncherPath();
 
@@ -47,36 +78,45 @@ public class StartupManager {
     }
   }
 
-  public boolean removeLauncherFromStartup() {
-    try {
-      String launcherPath = getLauncherPath();
-
-      if (launcherPath.isEmpty()) {
-        log.error("Failed to get launcher path. Launcher cannot be added to startup.");
-        return false;
-      }
-
-      if (launcherPath.endsWith(".exe")) {
-        String command = utilWindowsOS.buildCommandRemoveFromRegistry(UtilWindowsOS.USER_STARTUP_REGISTRY_KEY,
-            LAUNCHER_NAME);
-        boolean success = utilWindowsOS.executePowerShellCommand(command);
-
-        return success;
-      }
-
-      if (launcherPath.endsWith(".jar")) {
-        String shortcutPath = STARTUP_FOLDER_PATH + "\\\\" + LAUNCHER_NAME + ".lnk";
-        boolean success = utilWindowsOS.deleteShortcut(shortcutPath);
-
-        return success;
-      }
-
-      // Default action
-      return false;
-    } catch (Exception e) {
-      log.error("Failed to remove launcher from startup", e);
+  private boolean removeLauncherFromStartup() {
+    if (getLauncherPath().isEmpty()) {
+      log.error("Failed to get launcher path. Launcher cannot be removed from startup.");
       return false;
     }
+
+    boolean shortcutExists = utilWindowsOS.shortcutExists(STARTUP_FOLDER_PATH, LAUNCHER_NAME);
+    boolean registryEntryExists = utilWindowsOS.registryEntryExists(UtilWindowsOS.USER_STARTUP_REGISTRY_KEY,
+        LAUNCHER_NAME);
+
+    boolean shortcutRemoved = false;
+    boolean registryEntryRemoved = false;
+
+    // Remove shortcut if exists
+    if (shortcutExists) {
+      String shortcutPath = STARTUP_FOLDER_PATH + "\\\\" + LAUNCHER_NAME + ".lnk";
+      shortcutRemoved = utilWindowsOS.deleteShortcut(shortcutPath);
+
+      if (shortcutRemoved) {
+        log.debug("Launcher shortcut removed from startup.");
+      } else {
+        log.error("Failed to remove launcher shortcut from startup.");
+      }
+    }
+
+    // Remove registry entry if exists
+    if (registryEntryExists) {
+      String command = utilWindowsOS.buildCommandRemoveFromRegistry(UtilWindowsOS.USER_STARTUP_REGISTRY_KEY,
+          LAUNCHER_NAME);
+      registryEntryRemoved = utilWindowsOS.executePowerShellCommand(command);
+
+      if (registryEntryRemoved) {
+        log.debug("Launcher registry entry removed from startup.");
+      } else {
+        log.error("Failed to remove launcher registry entry from startup.");
+      }
+    }
+
+    return shortcutRemoved || registryEntryRemoved;
   }
 
   /**
