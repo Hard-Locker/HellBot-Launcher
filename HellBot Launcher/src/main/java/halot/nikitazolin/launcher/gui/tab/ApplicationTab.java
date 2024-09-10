@@ -30,6 +30,12 @@ public class ApplicationTab {
   public JPanel makeTab() {
     log.debug("Start making tab, {}", this);
 
+    JPanel appPanel = createApplicationPanel();
+
+    return appPanel;
+  }
+
+  private JPanel createApplicationPanel() {
     String tabNameText = tabProvider.getText("app_tab.tab_name");
     String currentAppText = tabProvider.getText("app_tab.current_app");
     String currentAppPathText = appService.currentApp() != null ? appService.currentApp()

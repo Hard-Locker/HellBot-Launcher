@@ -1,12 +1,8 @@
 package halot.nikitazolin.launcher.gui.tab;
 
-import java.awt.FlowLayout;
+import java.awt.GridBagLayout;
 
-import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 
 import org.springframework.stereotype.Component;
 
@@ -22,16 +18,18 @@ public class ConfigurationDbTab {
   private final TabProvider tabProvider;
 
   public JPanel makeTab() {
-    JPanel configPanel = new JPanel();
-    configPanel.setLayout(new FlowLayout());
-    JLabel configLabel = new JLabel("Настройки БД");
-    JTextArea configTextArea = new JTextArea(20, 50);
-    JButton saveConfigButton = new JButton("Сохранить");
+    log.debug("Start making tab, {}", this);
 
-    configPanel.add(configLabel);
-    configPanel.add(new JScrollPane(configTextArea));
-    configPanel.add(saveConfigButton);
+    JPanel dbPanel = createDbPanel();
 
-    return configPanel;
+    return dbPanel;
+  }
+
+  private JPanel createDbPanel() {
+    String tabNameText = tabProvider.getText("config_tab_db.tab_name");
+    JPanel dbPanel = new JPanel(new GridBagLayout());
+    dbPanel.setName(tabNameText);
+
+    return dbPanel;
   }
 }

@@ -30,8 +30,8 @@ public class SystemTrayManager implements AppStatusObserver {
 
   private static final String appName = ApplicationRunnerImpl.APP_NAME;
   private static final String iconPath = ApplicationRunnerImpl.APP_ICON_PATH;
-  private static final String iconTrayOnPath = ApplicationRunnerImpl.TRAY_ON_ICON_PATH;
-  private static final String iconTrayOffPath = ApplicationRunnerImpl.TRAY_OFF_ICON_PATH;
+  private static final String iconTrayOnPath = ApplicationRunnerImpl.APP_TRAY_ON_ICON_PATH;
+  private static final String iconTrayOffPath = ApplicationRunnerImpl.APP_TRAY_OFF_ICON_PATH;
 
   private final AppService appService;
   private final TrayProvider trayProvider;

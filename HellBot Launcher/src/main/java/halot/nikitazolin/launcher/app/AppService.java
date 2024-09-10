@@ -33,6 +33,9 @@ public class AppService {
 
   private final String jarAppName = "hell-bot";
   private final String directoryPath = ApplicationRunnerImpl.APP_DIRECTORY_PATH;
+  private final String backupPath = ApplicationRunnerImpl.APP_BACKUP_DIRECTORY_PATH;
+  private final String appSecretsName = ApplicationRunnerImpl.APP_SECRETS_FILE_NAME;
+  private final String appSettingsName = ApplicationRunnerImpl.APP_SETTINGS_FILE_NAME;
   private final List<AppStatusObserver> observers = new ArrayList<>();
 
   public void start() {
@@ -119,6 +122,16 @@ public class AppService {
       log.error("No application jar file found in directory: {}", directoryPath);
       return null;
     }
+  }
+
+  public void backupAppFiles() {
+    appFileManager.copyFile((directoryPath + "/" + appSecretsName), Paths.get(backupPath));
+    appFileManager.copyFile((directoryPath + "/" + appSettingsName), Paths.get(backupPath));
+  }
+  
+  public void restoreAppFiles() {
+    appFileManager.copyFile((backupPath + "/" + appSecretsName), Paths.get(directoryPath));
+    appFileManager.copyFile((backupPath + "/" + appSettingsName), Paths.get(directoryPath));
   }
 
   public void changeShowInTray(boolean showInTray) {

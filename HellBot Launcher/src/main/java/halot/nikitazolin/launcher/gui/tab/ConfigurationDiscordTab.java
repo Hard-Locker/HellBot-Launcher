@@ -1,12 +1,8 @@
 package halot.nikitazolin.launcher.gui.tab;
 
-import java.awt.FlowLayout;
+import java.awt.GridBagLayout;
 
-import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 
 import org.springframework.stereotype.Component;
 
@@ -22,16 +18,18 @@ public class ConfigurationDiscordTab {
   private final TabProvider tabProvider;
 
   public JPanel makeTab() {
-    JPanel configPanel = new JPanel();
-    configPanel.setLayout(new FlowLayout());
-    JLabel configLabel = new JLabel("Настройки Discord API");
-    JTextArea configTextArea = new JTextArea(20, 50);
-    JButton saveConfigButton = new JButton("Сохранить");
+    log.debug("Start making tab, {}", this);
 
-    configPanel.add(configLabel);
-    configPanel.add(new JScrollPane(configTextArea));
-    configPanel.add(saveConfigButton);
+    JPanel discordPanel = createDiscordPanel();
 
-    return configPanel;
+    return discordPanel;
+  }
+
+  private JPanel createDiscordPanel() {
+    String tabNameText = tabProvider.getText("config_tab_discord.tab_name");
+    JPanel discordPanel = new JPanel(new GridBagLayout());
+    discordPanel.setName(tabNameText);
+
+    return discordPanel;
   }
 }

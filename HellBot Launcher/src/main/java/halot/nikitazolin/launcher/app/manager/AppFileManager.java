@@ -10,6 +10,8 @@ import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -262,6 +264,42 @@ public class AppFileManager {
     } catch (IOException | JSONException ex) {
       log.error("Exception occurred while fetching latest version", ex);
       return Optional.empty();
+    }
+  }
+  
+  /**
+   * Backs up or restores a file to/from the specified directory. If the target
+   * directory does not exist, it will be created.
+   *
+   * @param sourceFilePath  Path to the file to backup or restore
+   * @param targetDirectory Path to the target directory where the file will be
+   *                        backed up or restored
+   * @return boolean true if the operation was successful, false otherwise
+   */
+  public boolean copyFile(String sourceFilePath, Path targetDirectory) {
+    Path sourcePath = Paths.get(sourceFilePath);
+
+    if (!Files.exists(sourcePath)) {
+      log.warn("Source file does not exist: {}", sourceFilePath);
+      return false;
+    }
+
+    try {
+      if (!Files.exists(targetDirectory)) {
+        log.info("Creating target directory: {}", targetDirectory);
+        Files.createDirectories(targetDirectory);
+      }
+
+      Path fileName = sourcePath.getFileName();
+      Path targetPath = targetDirectory.resolve(fileName);
+      log.info("Backing up or restoring file from {} to {}", sourcePath, targetPath);
+      Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+      log.info("File successfully backed up or restored to: {}", targetPath);
+
+      return true;
+    } catch (IOException e) {
+      log.error("Error occurred while backing up or restoring file", e);
+      return false;
     }
   }
 }

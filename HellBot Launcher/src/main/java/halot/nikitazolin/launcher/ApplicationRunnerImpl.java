@@ -21,12 +21,15 @@ public class ApplicationRunnerImpl implements ApplicationRunner {
 
   public static final String APP_NAME = "HellBot Launcher";
   public static final String APP_ICON_PATH = "/image/hellbot_256x256.png";
-  public static final String TRAY_ON_ICON_PATH = "/image/ico/tray/tray_on_256x256.png";
-  public static final String TRAY_OFF_ICON_PATH = "/image/ico/tray/tray_off_256x256.png";
+  public static final String APP_TRAY_ON_ICON_PATH = "/image/ico/tray/tray_on_256x256.png";
+  public static final String APP_TRAY_OFF_ICON_PATH = "/image/ico/tray/tray_off_256x256.png";
   public static final String APP_DIRECTORY_PATH = "apps";
+  public static final String APP_BACKUP_DIRECTORY_PATH = "apps/backup";
+  public static final String APP_SECRETS_FILE_NAME = "secrets.yml";
+  public static final String APP_SETTINGS_FILE_NAME = "settings.yml";
+
   public static final String SETTINGS_FILE_PATH = "settings.yml";
   public static final String LANGUAGE_FILE_PATH = "language";
-  public static final String AUTHORIZATION_FILE_PATH = "apps/secrets.yml";
 
   private final LocalizationService localizationService;
   private final LauncherMainWindow launcherMainWindow;

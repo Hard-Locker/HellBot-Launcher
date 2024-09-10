@@ -1,12 +1,8 @@
 package halot.nikitazolin.launcher.gui.tab;
 
-import java.awt.FlowLayout;
+import java.awt.GridBagLayout;
 
-import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 
 import org.springframework.stereotype.Component;
 
@@ -22,16 +18,18 @@ public class ConfigurationYoutubeTab {
   private final TabProvider tabProvider;
 
   public JPanel makeTab() {
-    JPanel configPanel = new JPanel();
-    configPanel.setLayout(new FlowLayout());
-    JLabel configLabel = new JLabel("Настройки YouTube");
-    JTextArea configTextArea = new JTextArea(20, 50);
-    JButton saveConfigButton = new JButton("Сохранить");
+    log.debug("Start making tab, {}", this);
 
-    configPanel.add(configLabel);
-    configPanel.add(new JScrollPane(configTextArea));
-    configPanel.add(saveConfigButton);
+    JPanel youtubePanel = createYoutubePanel();
 
-    return configPanel;
+    return youtubePanel;
+  }
+
+  private JPanel createYoutubePanel() {
+    String tabNameText = tabProvider.getText("config_tab_youtube.tab_name");
+    JPanel youtubePanel = new JPanel(new GridBagLayout());
+    youtubePanel.setName(tabNameText);
+
+    return youtubePanel;
   }
 }
