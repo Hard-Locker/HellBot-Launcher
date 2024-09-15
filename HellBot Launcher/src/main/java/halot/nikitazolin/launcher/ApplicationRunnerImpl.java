@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ApplicationRunnerImpl implements ApplicationRunner {
 
-  public static final String APP_NAME = "HellBot Launcher";
+  public static final String LAUNCHER_NAME = "HellBot Launcher";
   public static final String APP_ICON_PATH = "/image/hellbot_256x256.png";
   public static final String APP_TRAY_ON_ICON_PATH = "/image/ico/tray/tray_on_256x256.png";
   public static final String APP_TRAY_OFF_ICON_PATH = "/image/ico/tray/tray_off_256x256.png";

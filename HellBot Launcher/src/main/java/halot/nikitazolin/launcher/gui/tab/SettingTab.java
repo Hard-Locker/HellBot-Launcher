@@ -8,10 +8,12 @@ import java.awt.Insets;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import org.springframework.stereotype.Component;
@@ -73,6 +75,8 @@ public class SettingTab {
     JCheckBox autostartAppCheckBox = createAutostartAppCheckBox();
     JComboBox<String> languageComboBox = createLanguageComboBox();
     JLabel restartHintLabel = createRestartHintLabel();
+    JCheckBox showCustomAppNameCheckBox = createShowCustomAppNameCheckBox();
+    JPanel customAppNameFieldPanel = createCustomAppNameField(showCustomAppNameCheckBox);
 
     panel.add(showInTrayCheckBox, positionComponent(gbc, 0, 0, 2));
     panel.add(hideOnCloseCheckBox, positionComponent(gbc, 0, 1, 2));
@@ -80,7 +84,11 @@ public class SettingTab {
     panel.add(autostartAppCheckBox, positionComponent(gbc, 0, 3, 2));
     panel.add(new JLabel(tabProvider.getText("setting_tab.language")), positionComponent(gbc, 0, 4, 1));
     panel.add(languageComboBox, positionComponent(gbc, 1, 4, 1));
-    panel.add(restartHintLabel, positionComponent(gbc, 0, 5, 2));
+
+    panel.add(showCustomAppNameCheckBox, positionComponent(gbc, 0, 5, 2));
+    panel.add(customAppNameFieldPanel, positionComponent(gbc, 0, 6, 2));
+
+    panel.add(restartHintLabel, positionComponent(gbc, 0, 7, 2));
 
     return panel;
   }
@@ -163,6 +171,54 @@ public class SettingTab {
     label.setForeground(Color.RED);
 
     return label;
+  }
+
+  private JCheckBox createShowCustomAppNameCheckBox() {
+    String showCustomAppNameText = tabProvider.getText("setting_tab.show_custom_app_name");
+    JCheckBox checkBox = new JCheckBox(showCustomAppNameText, settings.isShowCustomAppName());
+
+    checkBox.addActionListener(e -> {
+      boolean selected = checkBox.isSelected();
+      log.debug("Clicked checkbox: {}", checkBox.getName());
+      appService.changeShowCustomAppName(selected);
+    });
+
+    return checkBox;
+  }
+
+  private JPanel createCustomAppNameField(JCheckBox showCustomAppNameCheckBox) {
+    JPanel panel = new JPanel(new GridBagLayout());
+    GridBagConstraints gbc = createGridBagConstraints();
+
+    JTextField customAppNameTextField = new JTextField(20);
+    customAppNameTextField.setEnabled(settings.isShowCustomAppName());
+
+    JButton saveButton = new JButton(tabProvider.getText("setting_tab.save"));
+    saveButton.setEnabled(settings.isShowCustomAppName());
+
+    saveButton.addActionListener(e -> {
+      String customAppName = customAppNameTextField.getText();
+
+      if (!customAppName.isEmpty()) {
+        log.debug("Saving custom app name: {}", customAppName);
+        appService.setCustomAppName(customAppName);
+      } else {
+        log.warn("Custom app name is empty");
+      }
+    });
+
+    showCustomAppNameCheckBox.addActionListener(e -> {
+      boolean selected = showCustomAppNameCheckBox.isSelected();
+      customAppNameTextField.setEnabled(selected);
+      saveButton.setEnabled(selected);
+      log.debug("Custom app name field enabled: {}", selected);
+    });
+
+    panel.add(new JLabel(tabProvider.getText("setting_tab.custom_app_name")), positionComponent(gbc, 0, 0, 1));
+    panel.add(customAppNameTextField, positionComponent(gbc, 1, 0, 1));
+    panel.add(saveButton, positionComponent(gbc, 2, 0, 1));
+
+    return panel;
   }
 
   private GridBagConstraints createGridBagConstraints() {

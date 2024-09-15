@@ -36,6 +36,8 @@ public class SettingsLoader {
 
   private void safelyAssignSettings(Settings loadedConfig) {
     try {
+      settings.setCustomAppName(defaultIfNull(loadedConfig.getCustomAppName(), "HellBot"));
+      settings.setShowCustomAppName(defaultIfNull(loadedConfig.isShowCustomAppName(), true));
       settings.setShowInTray(defaultIfNull(loadedConfig.isShowInTray(), true));
       settings.setHideToTrayOnClose(defaultIfNull(loadedConfig.isHideToTrayOnClose(), true));
       settings.setAutostartLauncher(defaultIfNull(loadedConfig.isAutostartLauncher(), true));

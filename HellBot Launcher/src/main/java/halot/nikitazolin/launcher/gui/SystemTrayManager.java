@@ -28,7 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class SystemTrayManager implements AppStatusObserver {
 
-  private static final String appName = ApplicationRunnerImpl.APP_NAME;
   private static final String iconPath = ApplicationRunnerImpl.APP_ICON_PATH;
   private static final String iconTrayOnPath = ApplicationRunnerImpl.APP_TRAY_ON_ICON_PATH;
   private static final String iconTrayOffPath = ApplicationRunnerImpl.APP_TRAY_OFF_ICON_PATH;
@@ -54,12 +53,12 @@ public class SystemTrayManager implements AppStatusObserver {
     updateStatus();
   }
 
-  public void makeTray(JFrame frame) {
+  public void makeTray(JFrame frame, String appName) {
     checkSupported();
 
-    PopupMenu popupMenu = createPopupMenu(frame);
+    PopupMenu popupMenu = createPopupMenu(frame, appName);
 
-    trayIcon = initializeTrayImage();
+    trayIcon = initializeTrayImage(appName);
     trayIcon.setPopupMenu(popupMenu);
     trayIcon.setImageAutoSize(true);
 
@@ -75,7 +74,7 @@ public class SystemTrayManager implements AppStatusObserver {
     updateStatus();
   }
 
-  private TrayIcon initializeTrayImage() {
+  private TrayIcon initializeTrayImage(String appName) {
     URL iconUrl = getClass().getResource(iconPath);
 
     if (iconUrl != null) {
@@ -87,7 +86,7 @@ public class SystemTrayManager implements AppStatusObserver {
     }
   }
 
-  private PopupMenu createPopupMenu(JFrame frame) {
+  private PopupMenu createPopupMenu(JFrame frame, String appName) {
     PopupMenu popupMenu = new PopupMenu();
 
     String openText = trayProvider.getText("tray.open");
@@ -106,7 +105,7 @@ public class SystemTrayManager implements AppStatusObserver {
     openItem.addActionListener(e -> openMainWindow(frame));
     startItem.addActionListener(e -> startApp());
     stopItem.addActionListener(e -> stopApp());
-    shutdownItem.addActionListener(e -> shutdownApp());
+    shutdownItem.addActionListener(e -> shutdownApp(appName));
 
     popupMenu.add(openItem);
     popupMenu.addSeparator();
@@ -122,7 +121,7 @@ public class SystemTrayManager implements AppStatusObserver {
   private void openMainWindow(JFrame frame) {
     frame.setVisible(true);
     frame.setState(Frame.NORMAL);
-    log.debug("Window {} opened from tray", appName);
+    log.debug("Window opened from tray");
   }
 
   private void startApp() {
@@ -137,7 +136,7 @@ public class SystemTrayManager implements AppStatusObserver {
     updateStatus();
   }
 
-  private void shutdownApp() {
+  private void shutdownApp(String appName) {
     stopApp();
     log.info("Shutting down the application {}", appName);
     System.exit(0);

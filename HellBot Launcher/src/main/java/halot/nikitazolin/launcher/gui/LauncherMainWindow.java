@@ -27,7 +27,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class LauncherMainWindow {
 
-  private static final String appName = ApplicationRunnerImpl.APP_NAME;
   private static final String icoPath = ApplicationRunnerImpl.APP_ICON_PATH;
 
   private final StatusTab statusTab;
@@ -46,16 +45,24 @@ public class LauncherMainWindow {
   public void makeLauncherWindow(boolean windowVisible) {
     checkHeadless();
 
-    JFrame frame = makeWindow();
+    String appName = ApplicationRunnerImpl.LAUNCHER_NAME;
+
+    if (settings.isShowCustomAppName()) {
+      if (settings.getCustomAppName() != null && !settings.getCustomAppName().isEmpty()) {
+        appName = settings.getCustomAppName();
+      }
+    }
+
+    JFrame frame = makeWindow(appName);
 
     if (settings.isShowInTray()) {
-      systemTrayManager.makeTray(frame);
+      systemTrayManager.makeTray(frame, appName);
     }
 
     frame.setVisible(windowVisible);
   }
 
-  private JFrame makeWindow() {
+  private JFrame makeWindow(String appName) {
     JFrame frame = new JFrame(appName);
     frame.setSize(width, height);
     frame.setLocationRelativeTo(null);

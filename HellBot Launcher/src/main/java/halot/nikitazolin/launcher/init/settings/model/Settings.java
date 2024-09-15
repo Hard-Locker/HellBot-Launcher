@@ -10,6 +10,8 @@ import lombok.Data;
 @Data
 public class Settings {
 
+  private String customAppName = "HellBot";
+  private boolean showCustomAppName = true;
   private boolean showInTray = true;
   private boolean hideToTrayOnClose = true;
   private boolean autostartLauncher = true;

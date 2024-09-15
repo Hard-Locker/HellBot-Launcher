@@ -128,10 +128,24 @@ public class AppService {
     appFileManager.copyFile((directoryPath + "/" + appSecretsName), Paths.get(backupPath));
     appFileManager.copyFile((directoryPath + "/" + appSettingsName), Paths.get(backupPath));
   }
-  
+
   public void restoreAppFiles() {
     appFileManager.copyFile((backupPath + "/" + appSecretsName), Paths.get(directoryPath));
     appFileManager.copyFile((backupPath + "/" + appSettingsName), Paths.get(directoryPath));
+  }
+
+  public void setCustomAppName(String customAppName) {
+    log.info("Changing setting 'Set custom app name' to {}", customAppName);
+    settings.setCustomAppName(customAppName);
+    settingsService.saveSettings();
+    log.debug("'Show custom app name' setting updated");
+  }
+
+  public void changeShowCustomAppName(boolean showCustomAppName) {
+    log.info("Changing setting 'Show custom app name' to {}", showCustomAppName);
+    settings.setShowCustomAppName(showCustomAppName);
+    settingsService.saveSettings();
+    log.debug("'Show custom app name' setting updated");
   }
 
   public void changeShowInTray(boolean showInTray) {
